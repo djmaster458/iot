@@ -1,37 +1,30 @@
-/***
-  Read Our Complete Guide: https://RandomNerdTutorials.com/esp32-bme680-sensor-arduino/
-  Designed specifically to work with the Adafruit BME680 Breakout ----> http://www.adafruit.com/products/3660 These sensors use I2C or SPI to communicate, 2 or 4 pins are required to interface. Adafruit invests time and resources providing this open source code, please support Adafruit and open-source hardware by purchasing products from Adafruit! Written by Limor Fried & Kevin Townsend for Adafruit Industries. BSD license, all text above must be included in any redistribution
-***/
-
+// Libs for interfacing with the BME 680
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BME680.h"
 
-/*#define BME_SCK 18
-#define BME_MISO 19
-#define BME_MOSI 23
-#define BME_CS 5*/
-
+// Conversion Factors for BME 680 and UV Sensor
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define MILLIVOLTS_PER_VOLTS (1000)
 #define UV_INDEX_FACTOR (0.1)
 
-Adafruit_BME680 bme; // I2C
-//Adafruit_BME680 bme(BME_CS); // hardware SPI
-//Adafruit_BME680 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK);
+Adafruit_BME680 bme;
 
 void setup() {
+
+  // Setup serial monitor
   Serial.begin(115200);
   while (!Serial);
-  Serial.println(F("BME680 async test"));
 
+  // Init the BME 680 sensor
   if (!bme.begin()) {
-    Serial.println(F("Could not find a valid BME680 sensor, check wiring!"));
+    Serial.println("Could not find a valid BME680 sensor, check wiring!"));
     while (1);
   }
 
-  // Set up oversampling and filter initialization
+  // Set up oversampling and filters to defaults and heater for gas sensor
+  // Gas heater may affect results of temperature sensor, need to check documents
   bme.setTemperatureOversampling(BME680_OS_8X);
   bme.setHumidityOversampling(BME680_OS_2X);
   bme.setPressureOversampling(BME680_OS_4X);
@@ -43,60 +36,59 @@ void loop() {
   // Tell BME680 to begin measurement.
   unsigned long endTime = bme.beginReading();
   if (endTime == 0) {
-    Serial.println(F("Failed to begin reading :("));
+    Serial.println("Failed to begin reading..."));
     return;
   }
-  Serial.print(F("Reading started at "));
-  Serial.print(millis());
-  Serial.print(F(" and will finish at "));
-  Serial.println(endTime);
 
-  Serial.println(F("You can do other work during BME680 measurement."));
-  delay(50); // This represents parallel work.
-  // There's no need to delay() until millis() >= endTime: bme.endReading()
-  // takes care of that. It's okay for parallel work to take longer than
-  // BME680's measurement time.
+  // Serial.print("Reading started at "));
+  // Serial.print(millis());
+  // Serial.print(" and will finish at "));
+  // Serial.println(endTime);
 
-  // Obtain measurement results from BME680. Note that this operation isn't
-  // instantaneous even if milli() >= endTime due to I2C/SPI latency.
+  delay(50);
+
   if (!bme.endReading()) {
-    Serial.println(F("Failed to complete reading :("));
+    Serial.println("Failed to complete reading :(");
     return;
   }
-  Serial.print(F("Reading completed at "));
+  Serial.print("Reading completed at ");
   Serial.println(millis());
 
-  Serial.print(F("Temperature = "));
+  Serial.print("Temperature = ");
   Serial.print(bme.temperature);
-  Serial.println(F(" *C"));
+  Serial.println(" *C"));
 
-  Serial.print(F("Pressure = "));
+  Serial.print("Pressure = ");
   Serial.print(bme.pressure / 100.0);
-  Serial.println(F(" hPa"));
+  Serial.println(" hPa");
 
-  Serial.print(F("Humidity = "));
+  Serial.print("Humidity = "));
   Serial.print(bme.humidity);
   Serial.println(F(" %"));
 
-  Serial.print(F("Gas = "));
+  Serial.print("Gas = "));
   Serial.print(bme.gas_resistance / 1000.0);
-  Serial.println(F(" KOhms"));
+  Serial.println(" KOhms");
 
-  Serial.print(F("Approx. Altitude = "));
-  Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
-  Serial.println(F(" m"));
+  Serial.print("Altitude = ");
+  Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA);
+  Serial.println(" m"));
 
   Serial.println();
 
-  float uvAnalogValue = analogRead(36);
-  float uvVoltage = uvAnalogValue / 4095 * 3.3;
+  // Read the ADC value from the UV sensor
+  unsigned int uvAnalogValue = analogRead(2);
+  Serial.println(uvAnalogValue);
+
+  // Convert the uv analog value to voltage and then convert to index according to adafruit website
+  float uvVoltage = (float) uvAnalogValue / 4095 * 3.3;
   float uvIndex = uvVoltage / UV_INDEX_FACTOR;
 
-  Serial.print(F("UV Sensor Voltage in Volts = "));
-  Serial.printf("%.2f V", uvVoltage);
+  Serial.print("UV Sensor Voltage in Volts = ");
+  Serial.print"%.2f V", uvVoltage);
   Serial.println();
 
-  Serial.print(F("UV Index = "));
+  Serial.print("UV Index = ");
   Serial.print(uvIndex);
   Serial.println();
   delay(2000);

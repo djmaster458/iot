@@ -19,7 +19,7 @@ void setup() {
 
   // Init the BME 680 sensor
   if (!bme.begin()) {
-    Serial.println("Could not find a valid BME680 sensor, check wiring!"));
+    Serial.println("Could not find a valid BME680 sensor, check wiring!");
     while (1);
   }
 
@@ -36,7 +36,7 @@ void loop() {
   // Tell BME680 to begin measurement.
   unsigned long endTime = bme.beginReading();
   if (endTime == 0) {
-    Serial.println("Failed to begin reading..."));
+    Serial.println("Failed to begin reading...");
     return;
   }
 
@@ -56,23 +56,23 @@ void loop() {
 
   Serial.print("Temperature = ");
   Serial.print(bme.temperature);
-  Serial.println(" *C"));
+  Serial.println(" *C");
 
   Serial.print("Pressure = ");
   Serial.print(bme.pressure / 100.0);
   Serial.println(" hPa");
 
-  Serial.print("Humidity = "));
+  Serial.print("Humidity = ");
   Serial.print(bme.humidity);
   Serial.println(F(" %"));
 
-  Serial.print("Gas = "));
+  Serial.print("Gas = ");
   Serial.print(bme.gas_resistance / 1000.0);
   Serial.println(" KOhms");
 
   Serial.print("Altitude = ");
-  Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA);
-  Serial.println(" m"));
+  Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+  Serial.println(" m");
 
   Serial.println();
 
@@ -85,7 +85,7 @@ void loop() {
   float uvIndex = uvVoltage / UV_INDEX_FACTOR;
 
   Serial.print("UV Sensor Voltage in Volts = ");
-  Serial.print"%.2f V", uvVoltage);
+  Serial.printf("%.2f V", uvVoltage);
   Serial.println();
 
   Serial.print("UV Index = ");

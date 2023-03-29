@@ -1,3 +1,6 @@
+#include <ESPPerfectTime.h>
+#include <sntp_pt.h>
+
 #include <Adafruit_Sensor.h>
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
@@ -5,20 +8,25 @@
 #include "Adafruit_BME680.h"
 #include "secrets.h"
 #include "WiFi.h"
+#include "time.h"
 
+// Constants and Pins for Sensors
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define MILLIVOLTS_PER_VOLTS (1000)
-#define UV_INDEX_FACTOR (0.1)
-#define UV_SENSOR_GPIO_PIN (36)
 #define LIGHT_SENSOR_GPIO_PIN (39)
 
+// MQTT Topics, sub topic is for debugging purposes
 #define AWS_IOT_PUBLISH_TOPIC   "esp32/pub"
 #define AWS_IOT_SUBSCRIBE_TOPIC "esp32/sub"
+
+const char *ntpServer = "pool.ntp.org";
 
 const unsigned long PUBLISH_INTERVAL_MSEC = 1 * 60 * 1000; //1 minutes or  60,000 ms
 
 struct SensorData
 {
+  time_t tsSec;
+  time_t tsMsec;
   float temperature;
   float pressure;
   float humidity;
@@ -27,6 +35,7 @@ struct SensorData
   float lsRatio;
 };
 
+// Globals for Network Client and mqtt client using AWS credentials in setup
 WiFiClientSecure net = WiFiClientSecure();
 PubSubClient client(net);
 
@@ -35,6 +44,7 @@ SensorData cachedRecord;
 
 unsigned long lastPublish = 0;
 
+// Connects the user to AWS IoT Core for MQTT messaging, use provided Thing credentials from AWS in secrets.h
 void ConnectAWS()
 {
   WiFi.mode(WIFI_STA);
@@ -76,6 +86,22 @@ void ConnectAWS()
   Serial.println("AWS IoT Connected!");
 }
 
+// Uses the ESPPerfectTime Lib to get a microsecond resolution timestamp
+void StoreTimestamps()
+{
+  struct timeval tv;
+
+  if(pftime::gettimeofday(&tv, nullptr) != 0)
+  {
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+  }
+
+  cachedRecord.tsSec = tv.tv_sec;
+  cachedRecord.tsMsec = tv.tv_usec / 1000;
+}
+
+//Moves data from sensors into temporary struct
 void StoreSensorReadings()
 {
   cachedRecord.temperature = bme.temperature;
@@ -87,6 +113,8 @@ void StoreSensorReadings()
   cachedRecord.lsRatio = (float) cachedRecord.lsVoltage / 3.3;
 }
 
+// Init the BME Sensor, and set the oversampling for precision (defaults used). and warmup for gas heater
+// Should be done before Wifi Init
 void SetupBMESensor()
 {
   if (!bme.begin()) {
@@ -101,18 +129,23 @@ void SetupBMESensor()
   bme.setGasHeater(320, 150); // 320*C for 150 ms
 }
 
+// Serialize sensor data and timestamps into payload as JSON format
 void SerializeSensorData(char *payload, size_t payloadSize)
 {
   StaticJsonDocument<200> doc;
+  doc["id"] = "derek";
   doc["temp"] = cachedRecord.temperature;
   doc["pressure"] = cachedRecord.pressure;
   doc["humidity"] = cachedRecord.humidity;
   doc["gas"] = cachedRecord.gasResistance;
   doc["lsVoltage"] = cachedRecord.lsVoltage;
   doc["lsRatio"] = cachedRecord.lsRatio;
+  doc["tsSec"] = cachedRecord.tsSec;
+  doc["tsMsec"] = cachedRecord.tsMsec;
   serializeJson(doc, payload, payloadSize);
 }
- 
+
+// Callback for subscription messages, for debugging or diagnostics
 void ReceivedMessageHandler(char* topic, byte* payload, unsigned int length)
 {
   Serial.print("incoming: ");
@@ -123,23 +156,29 @@ void ReceivedMessageHandler(char* topic, byte* payload, unsigned int length)
   const char* message = doc["message"];
   Serial.println(message);
 }
- 
+
 void setup()
 {
   Serial.begin(115200);
   SetupBMESensor();
   ConnectAWS();
+
+  // Config the time library to GMT / UTC time
+  pftime::configTzTime(PSTR("GMT"), ntpServer);
 }
  
 void loop()
 {
+  // loop for messages arrived and stay alives
   client.loop();
   unsigned long now = millis();
   unsigned long timeSinceLastPublish = now - lastPublish;
 
+  // Attempt Publish every Interval
   if(timeSinceLastPublish > PUBLISH_INTERVAL_MSEC) {
     lastPublish = now;
 
+    // Synchronous reading of bme sensor, should be very quick, sub-ms
     unsigned long endTime = bme.beginReading();
     if(endTime == 0 || !bme.endReading())
     {
@@ -147,11 +186,15 @@ void loop()
       return;
     }
 
+    // Record data and timestamps into a payload and publish to the AWS Topic
     StoreSensorReadings();
+    StoreTimestamps();
     
     char payload[200];
     SerializeSensorData(payload, sizeof(payload));
+    Serial.println(payload);
 
+    Serial.println("Publishing...");
     if(!client.publish(AWS_IOT_PUBLISH_TOPIC, payload))
     {
       Serial.println(F("Unable to publish reading, check wifi connection..."));

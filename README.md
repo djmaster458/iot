@@ -46,7 +46,7 @@ In this project, we used AWS IoT, RDS, and Lambda alongside and ESP32 microcontr
 - Attach the sample SQL filter from the source into Rule's SQL statement block
 - Create a new action for an AWs Lambda function, calling the function IoTToRDS
 
-## AWS Lambda
+### AWS Lambda
 - In AWS Lambda, upload the `lambda_function.zip` file into the lambda editor
 - Click Add Trigger and find your AWS IoT Rule you created
 - Modify the Lambda script with your database endpoint, schema name, table name,username, and password
@@ -55,7 +55,7 @@ In this project, we used AWS IoT, RDS, and Lambda alongside and ESP32 microcontr
     - Under Permissions, attach a policy to the IoT rule allowing Lambda Function Invocation
     - (Suggested) Test that lambda function with `lambda_test.json` provided in the source folder
 
-## Grafana
+### Grafana
 - Download Grafana, install, and start the Grafana service
 - Go to `localhost:3000` in a browser of your choice
 - Under the Settings Cog -> Data Sources, click Add Data Source
@@ -67,11 +67,10 @@ In this project, we used AWS IoT, RDS, and Lambda alongside and ESP32 microcontr
         - If you don't double check configuration and if your IP is allowed under the RDS Inbound Rules in the AWS Console
 - Go back to Data Sources and start creating a dashboard.
 
-## Notes
+### Notes
 - Latency may show up as negative, this is because the ESP32 libraries only really supports second accurate timestamps. Due to SNTP drifting, this will cause latency recording to be inaccurate after time. Use an SQL filter to remove these values and reset the device to get a better timestamp. This may be changed or removed in future iterations.
 - Be sure your AWS policies for each resource have all necessary access such as Lambda Invocation by the Messaging Rule, or RDS Inbound Firewall Rules allow your traffic 
 
 
 You have now completed the project configuration! A sample dashboard can be seen below for reference.  
 Dashboard configuration is left to the user to explore.
-

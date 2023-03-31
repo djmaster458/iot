@@ -18,7 +18,7 @@ In this project, we used AWS IoT, RDS, and Lambda alongside and ESP32 microcontr
     - Adafruit BME 680
 
 ## Project Configuration
-## AWS RDS
+### AWS RDS
 - In AWS RDS Console, launch a new MySQL instance for free tier
     - Make the RDS publically visible
     - Under security, allow all traffic from the default security group and your IP
@@ -30,7 +30,7 @@ In this project, we used AWS IoT, RDS, and Lambda alongside and ESP32 microcontr
 
 ### ESP32
 - Clone the repository and open the `main.ino` file with Arduino IDE
-- Add the `secrets.h` template file to your arduino project
+- Add the `secrets_temp.h` file to your arduino project, rename it `secrets.h`
 - Configure your WiFi Credentials in your local `secrets.h` file, we will revisit this later
 - Install all libraries mentioned above
 - Configure your Device name in the `main.ino` on line 34

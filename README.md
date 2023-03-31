@@ -28,7 +28,7 @@ In this project, we used AWS IoT, RDS, and Lambda alongside and ESP32 microcontr
 - Create a new schema and table, noting their names
     - The table should follow the create table statement in the provided source example `mysql_table.sql`
 
-### ESP32 Part 1
+### ESP32
 - Clone the repository and open the `main.ino` file with Arduino IDE
 - Add the `secrets.h` template file to your arduino project
 - Configure your WiFi Credentials in your local `secrets.h` file, we will revisit this later
@@ -49,7 +49,7 @@ In this project, we used AWS IoT, RDS, and Lambda alongside and ESP32 microcontr
 ## AWS Lambda
 - In AWS Lambda, upload the `lambda_function.zip` file into the lambda editor
 - Click Add Trigger and find your AWS IoT Rule you created
-- Modify the Lambda script with your database endpoint, username, and password
+- Modify the Lambda script with your database endpoint, schema name, table name,username, and password
 - Under the Configuration Tab, perform the following
     - Under VPC -> Edit, add the default VPC and all subnets shared with the MySQL Instance (check the RDS console MySQL instance)
     - Under Permissions, attach a policy to the IoT rule allowing Lambda Function Invocation

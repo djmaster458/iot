@@ -1,0 +1,10 @@
+{
+    "id": "junk",
+    "TemperatureC": "25.0",
+    "PressureHpa": "10.0",
+    "HumidityPercent": "50.0",
+    "GasOhms": "21.0",
+    "LightSensorVoltage": "1.3",
+    "LightSensorPercent": "50.0",
+    "latency": 20
+}

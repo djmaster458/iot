@@ -24,7 +24,7 @@
 // MQTT Topics, sub topic is for debugging purposes
 #define AWS_IOT_PUBLISH_TOPIC   "esp32/pub"
 #define AWS_IOT_SUBSCRIBE_TOPIC "esp32/sub"
-#define DEVICE_ID "derek"
+#define DEVICE_ID "<your_device_id>"
 
 const char *ntpServer = "pool.ntp.org";
 

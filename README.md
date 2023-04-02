@@ -26,14 +26,17 @@ In this project, we used AWS IoT, RDS, and Lambda alongside and ESP32 microcontr
 - Download MySQL Workbench and Server 8.0
 - Using the command-line or Workbench, access the database (once in Ready Status) with your credentials
 - Create a new schema and table, noting their names
-    - The table should follow the create table statement in the provided source example `mysql_table.sql`
+![MySQL Schema](resources/mysql_table_schema.JPG)
 
 ### ESP32
 - Clone the repository and open the `main.ino` file with Arduino IDE
 - Add the `secrets_temp.h` file to your arduino project, rename it `secrets.h`
 - Configure your WiFi Credentials in your local `secrets.h` file, we will revisit this later
-- Install all libraries mentioned above
+    - Note: If using a public network, leave the WiFi password as an empty string
+- Install all libraries mentioned above using the Library Manager
+    - Also add ESP32 configurations to the board manager, check the [ExpressIf Guide](https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/installing.html)
 - Configure your Device name in the `main.ino` on line 34
+- Set the Arduino Serial Monitor to 115200 to see logs
 
 ### AWS IoT Core
 - In the AWS Console, find AWS IoT Core -> Things -> Create Things -> Create Single Thing

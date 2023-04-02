@@ -28,7 +28,7 @@
 
 const char *ntpServer = "pool.ntp.org";
 
-const unsigned long PUBLISH_INTERVAL_MSEC = 1 * SEC_PER_MIN * MSEC_PER_SEC; //1 minutes or  60,000 ms
+const unsigned long PUBLISH_INTERVAL_MSEC =  30 * MSEC_PER_SEC; //1 minutes or  60,000 ms
 
 struct SensorData
 {

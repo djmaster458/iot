@@ -18,6 +18,11 @@ In this project, we used AWS IoT, RDS, and Lambda alongside and ESP32 microcontr
     - Adafruit BME 680
 
 ## Project Configuration
+
+### Hardware
+Follow the schmatic below for configuring your breadboard.  
+Note this picture also includes an optional UV sensor.  
+![Breadboard and Wiring](resources/breadboard.jpg)
 ### AWS RDS
 - In AWS RDS Console, launch a new MySQL instance for free tier
     - Make the RDS publically visible

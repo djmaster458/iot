@@ -74,11 +74,16 @@ Note this picture also includes an optional UV sensor.
     - Click Save and Test, you should get a connection successful
         - If you don't double check configuration and if your IP is allowed under the RDS Inbound Rules in the AWS Console
 - Go back to Data Sources and start creating a dashboard.
+- Note: The original schema was not setup very well since we didn't choose a good primary key. Setting the primary key to (timestamp, device name) should improve searching, query structure for Grafana, and help with sharding which needs a temporal primary key to shard by time instead of count.
 
 ### Notes
 - Latency may show up as negative, this is because the ESP32 libraries only really supports second accurate timestamps. Due to SNTP drifting, this will cause latency recording to be inaccurate after time. Use an SQL filter to remove these values and reset the device to get a better timestamp. This may be changed or removed in future iterations.
-- Be sure your AWS policies for each resource have all necessary access such as Lambda Invocation by the Messaging Rule, or RDS Inbound Firewall Rules allow your traffic 
+- Be sure your AWS policies for each resource have all necessary access such as Lambda Invocation by the Messaging Rule, or RDS Inbound Firewall Rules allow your traffic
 
+### Improvements
+- Make the MySQL schema primary key (timestamp, device id) instead of a raw id column. This is improve searching greatly. Also, sharding would be helpful, especially since the cloud will charge if the db grows past some amount of GB storage. You may need to check AWS setting too.
+- Investigate AWS IoT Core metrics to see if you can calculate latency or throughput there. Those metrics can be exported from the IoT core into AWS Quicksight too.
+- Investigate other sensors to add to the ESP32 and data analytics like moving averages, stored procedures in the db may help this
 
 You have now completed the project configuration! A sample dashboard can be seen below for reference.  
 Dashboard configuration is left to the user to explore.
